@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflare-smtp-relay
+  labels:
+    app: cloudflare-smtp-relay
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudflare-smtp-relay
+  template:
+    metadata:
+      labels:
+        app: cloudflare-smtp-relay
+    spec:
+      containers:
+      - name: cloudflare-smtp-relay
+        image: ghcr.io/pixelvide/cloudflare-smtp-relay:latest
+        ports:
+        - containerPort: 587
+        env:
+        - name: SMTP_HOST
+          value: "0.0.0.0"
+        - name: SMTP_PORT
+          value: "587"
+        - name: SMTP_RELAY_CONFIG_PATH
+          value: "/app/config.yml"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/config.yml
+          subPath: config.yml
+          readOnly: true
+      volumes:
+      - name: config-volume
+        configMap:
+          name: smtp-relay-config
