@@ -20,10 +20,6 @@ spec:
         ports:
         - containerPort: 587
         env:
-        - name: SMTP_HOST
-          value: "0.0.0.0"
-        - name: SMTP_PORT
-          value: "587"
         - name: SMTP_RELAY_CONFIG_PATH
           value: "/app/config.yml"
         volumeMounts:

@@ -64,6 +64,7 @@ const server = new SMTPServer({
         const allowedFromDomains = userConfig.allowed_from_domains && userConfig.allowed_from_domains.length > 0 ? userConfig.allowed_from_domains : globalConfig.allowed_from_domains;
         
         if (!isAllowed(sender.address, allowedFromEmails, allowedFromDomains)) {
+          console.warn(`[SMTP] Blocked email: Sender address ${sender.address} is not allowed for user ${username}.`);
           return callback(new Error(`Sender address ${sender.address} is not allowed for this user.`));
         }
         
@@ -73,6 +74,7 @@ const server = new SMTPServer({
 
         for (const recipient of recipients) {
           if (!isAllowed(recipient.address, allowedToEmails, allowedToDomains)) {
+            console.warn(`[SMTP] Blocked email: Recipient address ${recipient.address} is not allowed for user ${username}.`);
             return callback(new Error(`Recipient address ${recipient.address} is not allowed for this user.`));
           }
         }

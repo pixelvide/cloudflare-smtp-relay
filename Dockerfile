@@ -12,10 +12,6 @@ RUN pnpm install --frozen-lockfile
 # Copy application source code
 COPY . .
 
-# Set host to 0.0.0.0 for Docker networking
-ENV SMTP_HOST=0.0.0.0
-ENV SMTP_PORT=587
-
 # Expose the SMTP port
 EXPOSE 587
 
