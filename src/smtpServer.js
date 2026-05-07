@@ -27,6 +27,8 @@ const server = new SMTPServer({
       console.log(`\n--- Received Email ---`);
       console.log(`From: ${parsed.from?.text}`);
       console.log(`To: ${parsed.to?.text}`);
+      console.log(`Cc: ${parsed.cc?.text}`);
+      console.log(`Bcc: ${parsed.bcc?.text}`);
       console.log(`Subject: ${parsed.subject}`);
 
       try {
@@ -68,14 +70,19 @@ const server = new SMTPServer({
           return callback(new Error(`Sender address ${sender.address} is not allowed for this user.`));
         }
         
-        const recipients = envelopeRecipients;
         const allowedToEmails = userConfig.allowed_to_emails && userConfig.allowed_to_emails.length > 0 ? userConfig.allowed_to_emails : globalConfig.allowed_to_emails;
         const allowedToDomains = userConfig.allowed_to_domains && userConfig.allowed_to_domains.length > 0 ? userConfig.allowed_to_domains : globalConfig.allowed_to_domains;
 
-        for (const recipient of recipients) {
-          if (!isAllowed(recipient.address, allowedToEmails, allowedToDomains)) {
-            console.warn(`[SMTP] Blocked email: Recipient address ${recipient.address} is not allowed for user ${username}.`);
-            return callback(new Error(`Recipient address ${recipient.address} is not allowed for this user.`));
+        const allAddressesToValidate = new Set();
+        if (envelopeRecipients) envelopeRecipients.forEach(r => allAddressesToValidate.add(r.address));
+        if (parsed.to && parsed.to.value) parsed.to.value.forEach(v => allAddressesToValidate.add(v.address));
+        if (parsed.cc && parsed.cc.value) parsed.cc.value.forEach(v => allAddressesToValidate.add(v.address));
+        if (parsed.bcc && parsed.bcc.value) parsed.bcc.value.forEach(v => allAddressesToValidate.add(v.address));
+
+        for (const address of allAddressesToValidate) {
+          if (!isAllowed(address, allowedToEmails, allowedToDomains)) {
+            console.warn(`[SMTP] Blocked email: Recipient address ${address} is not allowed for user ${username}.`);
+            return callback(new Error(`Recipient address ${address} is not allowed for this user.`));
           }
         }
 
