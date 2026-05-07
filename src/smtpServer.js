@@ -27,8 +27,8 @@ const server = new SMTPServer({
       console.log(`\n--- Received Email ---`);
       console.log(`From: ${parsed.from?.text}`);
       console.log(`To: ${parsed.to?.text}`);
-      console.log(`Cc: ${parsed.cc?.text}`);
-      console.log(`Bcc: ${parsed.bcc?.text}`);
+      if (parsed.cc && parsed.cc.text) console.log(`Cc: ${parsed.cc.text}`);
+      if (parsed.bcc && parsed.bcc.text) console.log(`Bcc: ${parsed.bcc.text}`);
       console.log(`Subject: ${parsed.subject}`);
 
       try {
